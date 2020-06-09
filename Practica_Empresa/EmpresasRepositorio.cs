@@ -14,11 +14,15 @@ namespace Practica_Empresa
         {
             using (SqlConnection conn = new SqlConnection(connect))
             {
-                using (SqlCommand cmd = new SqlCommand())
+                using (SqlCommand cmd = new SqlCommand("CreateEmpresa", conn))
                 {
-                    cmd.CommandText = $"INSERT INTO empresas (Nombre, Representante, RNC, Direccion, Borrado) VALUES ('{empresa.Nombre}', '{empresa.Representante}', '{empresa.RNC}', '{empresa.Direccion}', 0)";
-                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.StoredProcedure;
 
+                    cmd.Parameters.AddWithValue("Nombre", empresa.Nombre);
+                    cmd.Parameters.AddWithValue("Representante", empresa.Representante);
+                    cmd.Parameters.AddWithValue("RNC", empresa.RNC);
+                    cmd.Parameters.AddWithValue("Direccion", empresa.Direccion);
+                    
                     conn.Open();
 
                     try
@@ -39,8 +43,9 @@ namespace Practica_Empresa
         {
             using (SqlConnection conn = new SqlConnection(connect))
             {
-                using (SqlCommand cmd = new SqlCommand("SELECT RNC, Nombre, Representante FROM empresas WHERE borrado = 0", conn))
+                using (SqlCommand cmd = new SqlCommand("GetAll", conn))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
                     DataTable data = new DataTable();
                     SqlDataAdapter dataA = new SqlDataAdapter(cmd);
 
@@ -72,8 +77,11 @@ namespace Practica_Empresa
         {
             using (SqlConnection conn = new SqlConnection(connect))
             {
-                using (SqlCommand cmd = new SqlCommand($"SELECT RNC, Nombre, Representante FROM empresas WHERE RNC = '{rnc}' AND borrado = 0" , conn))
+                using (SqlCommand cmd = new SqlCommand("FindByRNC" , conn))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("RNC", rnc);
+                    
                     DataTable data = new DataTable();
 
                     conn.Open();
@@ -105,9 +113,14 @@ namespace Practica_Empresa
         {
             using (SqlConnection conn = new SqlConnection(connect))
             {
-                using (SqlCommand cmd = new SqlCommand($"UPDATE empresas SET Direccion = '{Aempresa.Direccion}', Representante = '{Aempresa.Representante}' WHERE RNC = '{rnc}' AND Borrado=0", conn))
+                using (SqlCommand cmd = new SqlCommand("UpdateEmpresa", conn))
                 {
-                    
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("Direccion", Aempresa.Direccion);
+                    cmd.Parameters.AddWithValue("Representante", Aempresa.Representante);
+                    cmd.Parameters.AddWithValue("RNC", rnc);
+
+
 
                     conn.Open();
 
@@ -131,8 +144,10 @@ namespace Practica_Empresa
         {
             using (SqlConnection conn = new SqlConnection(connect))
             {
-                using (SqlCommand cmd = new SqlCommand($"UPDATE empresas SET Borrado = 1 WHERE RNC = '{rnc}'", conn))
+                using (SqlCommand cmd = new SqlCommand("SoftDelete", conn))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("RNC", rnc);
                     
 
                     conn.Open();
